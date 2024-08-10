@@ -41,7 +41,11 @@ public class JsonNodeValidator {
 
         validationRules.put("age", Arrays.asList(
                 node -> {
-                    if (node.asInt() <= 0) {
+                    // Esta permitido que puede ser un valor nulo
+                    if(node == null || node.isNull()) return;
+
+                    // Si esta presente debe ser mayor a 0
+                    if (node.asInt() <= 0 ) {
                         throw new RuntimeException("El campo age debe ser un número positivo.");
                     }
                 }
