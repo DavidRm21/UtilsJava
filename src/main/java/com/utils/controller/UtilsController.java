@@ -1,6 +1,8 @@
 package com.utils.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.utils.utils.DateUtils;
 import com.utils.utils.EncoderUtils;
 import com.utils.utils.JsonNodeValidator;
 import com.utils.validator.JsonNodeValidator2;
@@ -10,6 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -49,11 +55,22 @@ public class UtilsController {
 
     @PostMapping("/validate")
     public ResponseEntity<String> validate(@RequestBody String request){
-
+        ObjectNode objectNode = null;
         JsonNode jsonNode = EncoderUtils.toJsonNode(request);
         JsonNodeValidator2 validator = new JsonNodeValidator2();
         validator.validate(jsonNode);
-        return ResponseEntity.ok(EncoderUtils.toJson(jsonNode));
+
+
+        String date = Optional.ofNullable(jsonNode.get("date"))
+                .map(JsonNode::textValue)
+                .orElse(null);
+
+        if (date != null){
+            objectNode = (ObjectNode) jsonNode;
+            objectNode.put("date", DateUtils.formatDateToMMYY(date) );
+        }
+
+        return ResponseEntity.ok(EncoderUtils.toJson( objectNode));
     }
 
 

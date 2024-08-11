@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 public class ValidationRules {
 
     private ValidationRules() {
-        // No instanciar
     }
 
     public static Map<String, List<Consumer<JsonNode>>> createValidationRules() {
