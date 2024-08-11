@@ -90,6 +90,7 @@ public class JsonNodeValidator {
 
     public void validate(JsonNode jsonNode) {
         validateNode(jsonNode, "");
+        
     }
 
     private void validateNode(JsonNode node, String parentKey) {

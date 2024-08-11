@@ -1,0 +1,26 @@
+## YAML Template.
+---
+services:
+  utils:
+    container_name: utilidades
+    image: utils-app:latest
+    ports:
+      - 8282:8282
+    environment:
+      - JAVA_OPTS=
+         -Xms256M 
+         -Xmx256M 
+
+##########################################################################     
+#keycloack Server
+##########################################################################  
+  keycloack_server:
+    container_name: id-keycloackServer
+    image: quay.io/keycloak/keycloak:latest
+    restart: always
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      DB_VENDOR: H2
+    ports:
+      - 8091:8080 
