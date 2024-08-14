@@ -5,35 +5,46 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @Component
 public class JsonNodeValidator2 {
 
-    private final Map<String, List<Consumer<JsonNode>>> validationRules = ValidationRules.createValidationRules();
+    private Map<String, List<Consumer<JsonNode>>> validationRules;
 
-    public void validate(JsonNode jsonNode) {
+    public void validate(JsonNode jsonNode, String strategy) {
+        this.validationRules = ValidationRules.createValidationRules(strategy);
         validateNode(jsonNode, "");
     }
 
     private void validateNode(JsonNode node, String parentKey) {
-        if (node.isObject()) {
-            node.fields().forEachRemaining(entry -> {
-                String fieldName = entry.getKey();
-                JsonNode fieldNode = entry.getValue();
-                String fullKey = parentKey.isEmpty() ? fieldName : parentKey + "." + fieldName;
+        validationRules.forEach((fullKey, validators) -> {
+            String[] keyParts = fullKey.split("\\.");
+            JsonNode currentNode = node;
+            StringBuilder currentKey = new StringBuilder();
 
-                // Validar el campo si tiene validaciones definidas
-                validationRules.getOrDefault(fullKey, List.of())
-                        .forEach(validator -> validator.accept(fieldNode));
+            for (int i = 0; i < keyParts.length; i++) {
+                String keyPart = keyParts[i];
+                if (!currentNode.has(keyPart)) {
+                    
+                    throw new RuntimeException("El campo requerido " + fullKey + " no está presente.");
+                }
+                currentNode = currentNode.get(keyPart);
+                currentKey.append(keyPart);
 
-                // Si el campo tiene hijos, validar los hijos
-                validateNode(fieldNode, fullKey);
-            });
-        } else {
-            // Validar si el nodo actual es un campo esperado
-            validationRules.getOrDefault(parentKey, List.of())
-                    .forEach(validator -> validator.accept(node));
-        }
+                // Si hemos llegado al último nivel, validamos
+                if (i == keyParts.length - 1) {
+                    for (Consumer<JsonNode> validator : validators) {
+                        validator.accept(currentNode);
+                    }
+                }
+
+                // Agregar un punto si no es la última clave
+                if (i < keyParts.length - 1) {
+                    currentKey.append(".");
+                }
+            }
+        });
     }
 }

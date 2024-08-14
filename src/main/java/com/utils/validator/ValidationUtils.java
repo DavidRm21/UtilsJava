@@ -1,11 +1,13 @@
 package com.utils.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+@Component
 public class ValidationUtils {
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(FieldConst.EMAIL_PATTERN);
