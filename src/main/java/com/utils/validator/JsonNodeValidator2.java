@@ -1,6 +1,7 @@
 package com.utils.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,8 +28,8 @@ public class JsonNodeValidator2 {
             for (int i = 0; i < keyParts.length; i++) {
                 String keyPart = keyParts[i];
                 if (!currentNode.has(keyPart)) {
-                    
-                    throw new RuntimeException("El campo requerido " + fullKey + " no está presente.");
+                    ((ObjectNode) currentNode).putNull(keyPart);
+//                    throw new RuntimeException("El campo requerido " + fullKey + " no está presente.");
                 }
                 currentNode = currentNode.get(keyPart);
                 currentKey.append(keyPart);
